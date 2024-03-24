@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+
     _usernameController.addListener(() {
       loginController.username.value = _usernameController.text.toLowerCase();
     });
@@ -39,38 +40,39 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Image.asset(
                   'assets/images/LOGO.png',
-                  width: 80,
+                  width: 100,
                   fit: BoxFit.contain,
                 ),
                 SizedBox(height: XCommon),
                 const Text(
                   "nolocker",
-                  style: TextStyle(color: kNeutral, fontSize: 30),
+                  style: TextStyle(color: kNeutral, fontSize: 26),
                 ),
-                const SizedBox(
-                  height: XLarge,
+                SizedBox(
+                  height: 100,
                 ),
-                TextField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
+                Container(
+                  padding: EdgeInsets.all(XCommon),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: kNeutralSoft,
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(XLarge),
+                        child: Image.asset(
+                          'assets/images/FOX.png',
+                          width: 150,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      ElevatedButton(
+                          onPressed: () => loginController.login(),
+                          child: const Text('Conectar com Metamask')),
+                    ],
                   ),
                 ),
-                const SizedBox(
-                  height: XCommon,
-                ),
-                const TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                  ),
-                ),
-                const SizedBox(
-                  height: XCommon,
-                ),
-                ElevatedButton(
-                    onPressed: () => Modular.to.pushNamed('/simulate'),
-                    child: const Text('entrar')),
               ]),
         ),
       ),

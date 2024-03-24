@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:nolocker/app/modules/metamask.dart';
 import 'package:nolocker/app/modules/simulate/simulate_controller.dart';
+import 'package:nolocker/app/services/contract/contract_service.dart';
 import 'package:nolocker/app/shared/utils/constantes.dart';
+import 'package:signals/signals_flutter.dart';
 
 class SimulatePage extends StatefulWidget {
   const SimulatePage({super.key});
@@ -96,21 +98,46 @@ class _SimulatePageState extends State<SimulatePage> {
             ),
             Stepper(
               physics: ScrollPhysics(),
+              controlsBuilder: (context, _) {
+                return Row(
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        if (_index > 0) {
+                          setState(() {
+                            _index -= 1;
+                          });
+                        }
+                      },
+                      child: const Text('Voltar'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        if (_index <= 0) {
+                          setState(() {
+                            _index += 1;
+                            print(_index);
+                          });
+                        }
+                        if (_index == 1) {
+                          await simulateController.innitContract();
+                          showDialog(
+                              context: context,
+                              builder: (_) => AcceptWidget(
+                                    value: simulateController
+                                        .contract.value.premium,
+                                    simulateController: simulateController,
+                                  ));
+                        }
+                      },
+                      child: Text(_index == 1 ? 'Finalizar' : 'Proximo'),
+                    ),
+                  ],
+                );
+              },
               currentStep: _index,
-              onStepCancel: () {
-                if (_index > 0) {
-                  setState(() {
-                    _index -= 1;
-                  });
-                }
-              },
-              onStepContinue: () async {
-                if (_index <= 0) {
-                  setState(() {
-                    _index += 1;
-                  });
-                }
-              },
+              // onStepCancel: () {},
+              // onStepContinue: () {}
               onStepTapped: (int index) {
                 setState(() {
                   _index = index;
@@ -205,7 +232,6 @@ class _SimulatePageState extends State<SimulatePage> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  print('object clicked');
                   simulateController.innitContract();
                 },
                 child: Text('gerar'))
@@ -248,6 +274,42 @@ class FormField extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AcceptWidget extends StatelessWidget {
+  const AcceptWidget(
+      {super.key, required this.value, required this.simulateController});
+  final SimulateController simulateController;
+
+  final value;
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Watch((context) => SizedBox(
+            width: 600,
+            height: 600,
+            child: Padding(
+              padding: EdgeInsets.only(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(
+                    Icons.check_circle_outline_rounded,
+                    color: Colors.green,
+                  ),
+                  Text('Valor do premio ${value}'),
+                  ElevatedButton(
+                      onPressed: () {
+                        simulateController.acceptContract();
+                      },
+                      child: Text('Aceitar'))
+                ],
+              ),
+            ),
+          )),
     );
   }
 }
