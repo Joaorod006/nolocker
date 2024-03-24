@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:nolocker/app/modules/metamask.dart';
 import 'package:nolocker/app/shared/utils/constantes.dart';
 
 class SimulatePage extends StatefulWidget {
@@ -9,6 +11,7 @@ class SimulatePage extends StatefulWidget {
 }
 
 class _SimulatePageState extends State<SimulatePage> {
+  MetaMaskProvider metaMaskProvider = Modular.get<MetaMaskProvider>();
   int _index = 0;
   @override
   Widget build(BuildContext context) {
@@ -62,7 +65,7 @@ class _SimulatePageState extends State<SimulatePage> {
                   _index = index;
                 });
               },
-              steps: const <Step>[
+              steps: <Step>[
                 Step(
                   title: Row(
                     children: [
@@ -83,6 +86,9 @@ class _SimulatePageState extends State<SimulatePage> {
                   content: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      ElevatedButton(
+                          onPressed: () => metaMaskProvider.connect(),
+                          child: Text("connect")),
                       Text("Seu nome completo:"),
                       SizedBox(
                         height: XSmall,
@@ -115,10 +121,7 @@ class _SimulatePageState extends State<SimulatePage> {
                     ],
                   ),
                   content: Column(
-                    children: [
-                      FormWidget(),
-                      FormWidget(),
-                    ],
+                    children: [],
                   ),
                 ),
               ],
@@ -182,3 +185,12 @@ class _FormWidgetState extends State<FormWidget> {
     );
   }
 }
+
+// Nome
+// Data nascimento,
+// CPF,
+
+// Modelo,
+// Ano de fabricaçao
+// Localidade,
+// Tipo do veiculo,

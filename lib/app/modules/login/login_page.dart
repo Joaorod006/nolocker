@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: XCommon,
               ),
               ElevatedButton(
-                  onPressed: () => loginController.login(),
+                  onPressed: () => Modular.to.pushNamed('/connect'),
                   child: const Text('entrar')),
               TextButton(
                   onPressed: () => loginController.login(),
