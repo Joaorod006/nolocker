@@ -3,7 +3,9 @@ const bodyParser = require('body-parser');
 const { ethers } = require('ethers');
 const axios = require('axios');
 require('dotenv').config();
-
+const contractABI = require('./ContratoABI');
+const cors = require('cors');
+let fetch;
 const app = express();
 const port = 8000;
 
@@ -14,10 +16,12 @@ const contratosTemporarios = {};
 const providerUrl = process.env.PROVIDER_URL;
 const privateKey = process.env.PRIVATE_KEY;
 const contractAddress = process.env.CONTRACT_ADDRESS;
-// Substitua a string vazia pela ABI real do seu contrato
-const contractABI = []; 
+
+
+
 
 app.use(bodyParser.json());
+app.use(cors())
 
 // Configuração do provider e do contrato
 const provider = new ethers.JsonRpcProvider(providerUrl);
@@ -58,6 +62,9 @@ app.post('/contrato/elaborar/', async (req, res) => {
     }
 });
 
+
+// Envio do contrato ao Piñata e Criação do NFT
+
 app.post('/contrato/aceitar/', async (req, res) => {
     const { walletAddress, aceiteContrato } = req.body;
 
@@ -66,76 +73,129 @@ app.post('/contrato/aceitar/', async (req, res) => {
     }
 
     try {
-        const dadosContrato = contratosTemporarios[walletAddress]; // Supondo que estes dados estejam armazenados em memória
+        const dadosContrato = contratosTemporarios[walletAddress];
 
         if (!dadosContrato) {
             return res.status(404).json({ status: 'error', message: "Dados do contrato não encontrados." });
         }
 
+        // Chama a função que envia os dados para o Pinata e espera pela URI de retorno
         const uriPinata = await enviarParaPinata(dadosContrato);
-        console.log("URI do Pinata:", uriPinata);
         
-        return res.status(200).json({ status: 'ok', message: "Contrato aceito e registrado na blockchain.", uri: uriPinata });
+        // Enviar a URI e o walletAddress para a blockchain para criar o NFT
+        const transaction = await contract.secureCar(uriPinata);
+        console.log(transaction)
+        const receipt = await transaction.wait(5); // Espera a transação ser concluída
+        //console.log(receipt)
+
+        // Após a criação do NFT, pode ser uma boa ideia limpar os dados temporários
+        delete contratosTemporarios[walletAddress];
+
+        return res.status(200).json({ status: 'ok', message: "Contrato aceito e NFT criado com sucesso.", uri: uriPinata });
+
     } catch (error) {
-        console.error("Erro ao processar a aceitação do contrato:", error);
-        return res.status(500).json({ status: 'error', message: "Erro ao processar a aceitação do contrato" });
+        console.error("Erro ao processar a aceitação do contrato e criação do NFT:", error);
+        return res.status(500).json({ status: 'error', message: "Erro ao processar a aceitação do contrato e criação do NFT" });
     }
 });
 
 
 const enviarParaPinata = async (dadosContrato) => {
-  try {
-    const data = JSON.stringify({
-      "pinataOptions": {
-        "cidVersion": 0
-      },
-      "pinataMetadata": {
-        "name": "Contrato_" + dadosContrato.walletAddress, // Exemplo de nomeação dinâmica
-        "keyvalues": {
-          "id": dadosContrato.walletAddress, // Utilizando o walletAddress como ID
+    try {
+      const data = JSON.stringify({
+        "pinataOptions": {
+          "cidVersion": 0
+        },
+        "pinataMetadata": {
+          "name": "Contrato_" + dadosContrato.walletAddress,
+          "keyvalues": {
+            "id": dadosContrato.walletAddress,
+          }
+        },
+        "pinataContent": dadosContrato
+      });
+  
+      const pinataResponse = await axios.post('https://api.pinata.cloud/pinning/pinJSONToIPFS', data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.PINATA_JWT}`
         }
-      },
-      "pinataContent": dadosContrato // Usando diretamente o objeto recebido
-    });
+      });
+  
+      const uriPinata = `https://gateway.pinata.cloud/ipfs/${pinataResponse.data.IpfsHash}`;
+      console.log('Dados contratados enviados ao Pinata:', uriPinata);
+      return uriPinata; // Retorna a URI para ser usada na criação do NFT
+    } catch (error) {
+      console.error("Erro ao enviar para o Pinata:", error);
+      throw error; // Lança o erro para ser tratado onde a função é chamada
+    }
+  };
 
-    const res = await axios.post('https://api.pinata.cloud/pinning/pinJSONToIPFS', data, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.PINATA_JWT}`
-      }
-    });
+app.get('/contrato/buscar/', async (req, res) => {
+    // Obtém o endereço da carteira a partir dos parâmetros da query
+    const walletAddress = req.query.walletAddress;
 
-    console.log(`Dados contratados enviados ao Pinata: https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`);
-    return `https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`; // Retorna a URI do conteúdo no IPFS
-  } catch (error) {
-    console.error("Erro ao enviar para o Pinata:", error);
-    throw error; // Repassar o erro para tratamento posterior
-  }
+    if (!walletAddress) {
+        return res.status(400).send('Endereço da carteira não fornecido.');
+    }
+
+    const url = `https://api.pinata.cloud/data/pinList?metadata={"wallet":"${walletAddress}"}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${process.env.PINATA_JWT}`
+        }
+    };
+
+    try {
+        // Carrega fetch dinamicamente se ainda não foi carregado
+        if (!fetch) {
+            fetch = (await import('node-fetch')).default;
+        }
+
+        const response = await fetch(url, options);
+        const data = await response.json();
+        res.json(data); // Envia os dados da resposta para o cliente
+    } catch (error) {
+        console.error('Erro ao buscar pins do Pinata:', error);
+        res.status(500).send('Erro ao buscar pins do Pinata.');
+    }
+});
+
+async function verificarSaldo() {
+    try {
+        // Obtém o saldo da carteira
+        const balance = await provider.getBalance(wallet.address);
+        console.log(`Saldo: ${ethers.formatEther(balance)} ETH`);
+
+        // Obtém os dados de taxa atual
+        const feeData = await provider.getFeeData();
+        console.log("Dados da taxa atual:");
+
+        // Imprime o preço do gás para transações legacy
+        if (feeData.gasPrice) {
+            console.log(`Preço do gás (legacy): ${ethers.formatUnits(feeData.gasPrice, 'gwei')} gwei`);
+        }
+        
+        // Imprime o maxFeePerGas e maxPriorityFeePerGas para redes que suportam EIP-1559
+        if (feeData.maxFeePerGas) {
+            console.log(`Max Fee Per Gas: ${ethers.formatUnits(feeData.maxFeePerGas, 'gwei')} gwei`);
+        }
+        if (feeData.maxPriorityFeePerGas) {
+            console.log(`Max Priority Fee Per Gas: ${ethers.formatUnits(feeData.maxPriorityFeePerGas, 'gwei')} gwei`);
+        }
+
+    } catch (error) {
+    console.error("Erro ao verificar o saldo:", error);
+}
 };
 
 
-/*
-// Rota POST para criar um NFT
-app.post('/nwt', async (req, res) => {
-    const { buyerAddress, uri } = req.body;
-
-    try {
-        const transaction = await contract.secureCar(buyerAddress, uri);
-        const receipt = await transaction.wait(); // Espera a transação ser concluída
-        const nftId = receipt.events?.[0]?.args?.[0];
-
-        res.status(201).json({ message: "NFT criado com sucesso", nftId });
-    } catch (error) {
-        console.error("Erro ao criar NFT:", error);
-        res.status(500).json({ message: "Erro ao criar NFT", error: error.message });
-    }
-});
-*/
-
-
+// Chama a função para verificar o saldo
+verificarSaldo();
 
 // Iniciar servidor
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
-  });
+console.log(`Servidor rodando em http://localhost:${port}`);
+});
 
