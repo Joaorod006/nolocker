@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:nolocker/app/modules/metamask.dart';
+import 'package:nolocker/app/modules/simulate/simulate_controller.dart';
 import 'package:nolocker/app/shared/utils/constantes.dart';
 
 class SimulatePage extends StatefulWidget {
@@ -12,7 +13,57 @@ class SimulatePage extends StatefulWidget {
 
 class _SimulatePageState extends State<SimulatePage> {
   MetaMaskProvider metaMaskProvider = Modular.get<MetaMaskProvider>();
+  SimulateController simulateController = Modular.get<SimulateController>();
+
   int _index = 0;
+
+  // final TextEditingController _Controller = TextEditingController();
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _idadeController = TextEditingController();
+  final TextEditingController _cnhController = TextEditingController();
+  final TextEditingController _estadoController = TextEditingController();
+
+  final TextEditingController _fabricanteController = TextEditingController();
+  final TextEditingController _modeloController = TextEditingController();
+  final TextEditingController _anoVeiculoController = TextEditingController();
+  final TextEditingController _placaController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nomeController.addListener(() {
+      simulateController.contract.value.name =
+          _nomeController.text.toLowerCase();
+    });
+    _idadeController.addListener(() {
+      simulateController.contract.value.age =
+          _idadeController.text.toLowerCase();
+    });
+    _cnhController.addListener(() {
+      simulateController.contract.value.age = _cnhController.text.toLowerCase();
+    });
+    _estadoController.addListener(() {
+      simulateController.contract.value.age =
+          _estadoController.text.toLowerCase();
+    });
+    _fabricanteController.addListener(() {
+      simulateController.contract.value.age =
+          _fabricanteController.text.toLowerCase();
+    });
+    _modeloController.addListener(() {
+      simulateController.contract.value.age =
+          _modeloController.text.toLowerCase();
+    });
+    _anoVeiculoController.addListener(() {
+      simulateController.contract.value.age =
+          _anoVeiculoController.text.toLowerCase();
+    });
+    _placaController.addListener(() {
+      simulateController.contract.value.age =
+          _placaController.text.toLowerCase();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +104,7 @@ class _SimulatePageState extends State<SimulatePage> {
                   });
                 }
               },
-              onStepContinue: () {
+              onStepContinue: () async {
                 if (_index <= 0) {
                   setState(() {
                     _index += 1;
@@ -80,25 +131,30 @@ class _SimulatePageState extends State<SimulatePage> {
                       SizedBox(
                         width: XCommon,
                       ),
-                      Text('Dados do Veiculo'),
+                      Text('Dados do Condutor'),
                     ],
                   ),
                   content: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ElevatedButton(
-                          onPressed: () => metaMaskProvider.connect(),
-                          child: Text("connect")),
-                      Text("Seu nome completo:"),
-                      SizedBox(
-                        height: XSmall,
+                      FormField(
+                        controller: _nomeController,
+                        title: 'Insira seu nome:',
+                        label: 'Nome',
                       ),
-                      TextField(
-                        decoration:
-                            InputDecoration(label: Text('Nome completo')),
+                      FormField(
+                        controller: _idadeController,
+                        title: 'Sua idade:',
+                        label: 'Idade',
                       ),
-                      SizedBox(
-                        height: XCommon,
+                      FormField(
+                        controller: _estadoController,
+                        title: 'Seu estado:',
+                        label: 'Estado(US)',
+                      ),
+                      FormField(
+                        controller: _cnhController,
+                        title: 'Seu CNH:',
+                        label: 'CNH',
                       ),
                     ],
                   ),
@@ -121,11 +177,38 @@ class _SimulatePageState extends State<SimulatePage> {
                     ],
                   ),
                   content: Column(
-                    children: [],
+                    children: [
+                      FormField(
+                        controller: _fabricanteController,
+                        title: 'Fabricante do veiculo:',
+                        label: 'Fabricante',
+                      ),
+                      FormField(
+                        controller: _modeloController,
+                        title: 'Modelo do veiculo:',
+                        label: 'Modelo',
+                      ),
+                      FormField(
+                        controller: _anoVeiculoController,
+                        title: 'Ano do veiculo:',
+                        label: 'Ano',
+                      ),
+                      FormField(
+                        controller: _placaController,
+                        title: 'Placa do veiculo:',
+                        label: 'Placa',
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
+            ElevatedButton(
+                onPressed: () {
+                  print('object clicked');
+                  simulateController.innitContract();
+                },
+                child: Text('gerar'))
           ],
         ),
       ),
@@ -133,64 +216,38 @@ class _SimulatePageState extends State<SimulatePage> {
   }
 }
 
-class FormWidget extends StatefulWidget {
-  const FormWidget({super.key});
+class FormField extends StatelessWidget {
+  const FormField({
+    super.key,
+    required TextEditingController controller,
+    required this.title,
+    required this.label,
+  }) : _controller = controller;
 
-  @override
-  State<FormWidget> createState() => _FormWidgetState();
-}
+  final TextEditingController _controller;
+  final String title;
+  final String label;
 
-class _FormWidgetState extends State<FormWidget> {
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        const TextField(
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Password',
+    return SizedBox(
+      width: 400,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title),
+          SizedBox(
+            height: XSmall,
           ),
-        ),
-        SizedBox(
-          height: XCommon,
-        ),
-        const TextField(
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Password',
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(label: Text(label)),
           ),
-        ),
-        SizedBox(
-          height: XCommon,
-        ),
-        const TextField(
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Password',
+          SizedBox(
+            height: XCommon,
           ),
-        ),
-        SizedBox(
-          height: XCommon,
-        ),
-        const TextField(
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Password',
-          ),
-        ),
-        SizedBox(
-          height: XCommon,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
-
-// Nome
-// Data nascimento,
-// CPF,
-
-// Modelo,
-// Ano de fabricaçao
-// Localidade,
-// Tipo do veiculo,

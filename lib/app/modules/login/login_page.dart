@@ -34,48 +34,44 @@ class _LoginPageState extends State<LoginPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: XLarge),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/LOGO.png',
-                width: 80,
-                fit: BoxFit.contain,
-              ),
-              SizedBox(height: XCommon),
-              const Text(
-                "nolocker",
-                style: TextStyle(color: kNeutral, fontSize: 30),
-              ),
-              const SizedBox(
-                height: XLarge,
-              ),
-              TextField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/LOGO.png',
+                  width: 80,
+                  fit: BoxFit.contain,
                 ),
-              ),
-              const SizedBox(
-                height: XCommon,
-              ),
-              const TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
+                SizedBox(height: XCommon),
+                const Text(
+                  "nolocker",
+                  style: TextStyle(color: kNeutral, fontSize: 30),
                 ),
-              ),
-              const SizedBox(
-                height: XCommon,
-              ),
-              ElevatedButton(
-                  onPressed: () => Modular.to.pushNamed('/'),
-                  child: const Text('entrar')),
-              TextButton(
-                  onPressed: () => loginController.login(),
-                  child: Text("entrar")),
-            ],
-          ),
+                const SizedBox(
+                  height: XLarge,
+                ),
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                  ),
+                ),
+                const SizedBox(
+                  height: XCommon,
+                ),
+                const TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                  ),
+                ),
+                const SizedBox(
+                  height: XCommon,
+                ),
+                ElevatedButton(
+                    onPressed: () => Modular.to.pushNamed('/simulate'),
+                    child: const Text('entrar')),
+              ]),
         ),
       ),
     );

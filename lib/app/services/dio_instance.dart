@@ -6,9 +6,9 @@ import 'package:dio/dio.dart';
 // ));
 
 final BaseOptions options = BaseOptions(
-  baseUrl: 'https://your-api-base-url.com',
-  connectTimeout: Duration(seconds: 5),
-  receiveTimeout: Duration(seconds: 3),
+  baseUrl: 'http://172.16.0.227:8000',
+  connectTimeout: Duration(seconds: 10),
+  receiveTimeout: Duration(seconds: 10),
   headers: {
     'Content-Type': 'application/json',
   },
