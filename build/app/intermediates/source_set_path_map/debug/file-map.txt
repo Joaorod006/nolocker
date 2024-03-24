@@ -1,0 +1,16 @@
+com.example.nolocker.app-debug-0 C:\Projects\Works\NOLOCKER\nolocker\android\app\src\debug\res
+com.example.nolocker.app-main-1 C:\Projects\Works\NOLOCKER\nolocker\android\app\src\main\res
+com.example.nolocker.app-pngs-2 C:\Projects\Works\NOLOCKER\nolocker\build\app\generated\res\pngs\debug
+com.example.nolocker.app-resValues-3 C:\Projects\Works\NOLOCKER\nolocker\build\app\generated\res\resValues\debug
+com.example.nolocker.app-rs-4 C:\Projects\Works\NOLOCKER\nolocker\build\app\generated\res\rs\debug
+com.example.nolocker.app-mergeDebugResources-5 C:\Projects\Works\NOLOCKER\nolocker\build\app\intermediates\incremental\debug\mergeDebugResources\merged.dir
+com.example.nolocker.app-mergeDebugResources-6 C:\Projects\Works\NOLOCKER\nolocker\build\app\intermediates\incremental\debug\mergeDebugResources\stripped.dir
+com.example.nolocker.app-merged_res-7 C:\Projects\Works\NOLOCKER\nolocker\build\app\intermediates\merged_res\debug
+com.example.nolocker.app-packaged_res-8 C:\Projects\Works\NOLOCKER\nolocker\build\path_provider_android\intermediates\packaged_res\debug
+com.example.nolocker.app-packaged_res-9 C:\Projects\Works\NOLOCKER\nolocker\build\url_launcher_android\intermediates\packaged_res\debug
+com.example.nolocker.app-core-1.10.1-10 C:\Users\thale\.gradle\caches\transforms-3\18703ca352e045e9d46c7937df0b1b47\transformed\core-1.10.1\res
+com.example.nolocker.app-jetified-window-1.0.0-beta04-11 C:\Users\thale\.gradle\caches\transforms-3\2534cb10a453dd1f7318651afba4a7a8\transformed\jetified-window-1.0.0-beta04\res
+com.example.nolocker.app-browser-1.5.0-12 C:\Users\thale\.gradle\caches\transforms-3\3f8741f65769de8e4b845cd97ba2a62d\transformed\browser-1.5.0\res
+com.example.nolocker.app-lifecycle-runtime-2.3.1-13 C:\Users\thale\.gradle\caches\transforms-3\6880c3b6a1a2ef9147a88b7502e3ac07\transformed\lifecycle-runtime-2.3.1\res
+com.example.nolocker.app-jetified-annotation-experimental-1.3.0-14 C:\Users\thale\.gradle\caches\transforms-3\bb7dddb1fe45b1fb9b2a4590e2dab45c\transformed\jetified-annotation-experimental-1.3.0\res
+com.example.nolocker.app-jetified-window-java-1.0.0-beta04-15 C:\Users\thale\.gradle\caches\transforms-3\d5f225fe126177b59dd307998185e480\transformed\jetified-window-java-1.0.0-beta04\res
